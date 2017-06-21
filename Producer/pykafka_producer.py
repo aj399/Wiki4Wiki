@@ -4,6 +4,7 @@ from pykafka.partitioners import HashingPartitioner
 from pykafka.partitioners import BasePartitioner
 import numpy as np
 from datetime import date
+import time
 import string
 import random
 import time
@@ -31,9 +32,9 @@ def producerFunc(singlewindow=False ):
 
 def produceFun(producer):
     currItem = random.choice(string.letters)
-    dTime = date.today().ctime()
+    dTime = time.time()
     print currItem, dTime
-    outputStr = "{};{}".format(currItem, dTime) 
+    outputStr = "{};{}".format(currItem, np.int64(np.floor(dTime))) 
     producer.produce(outputStr, partition_key=str(currItem))
     
 if __name__ == '__main__':
