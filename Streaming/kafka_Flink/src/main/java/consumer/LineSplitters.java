@@ -12,7 +12,7 @@
         }
     }
 	
-	public static class LnSplitArtPv1hr6no implements FlatMapFunction<Tuple3<String, String, String >, Tuple7<String, Long, Long, Long, Long, Long, Long>> {
+	public static class LnSplitArtPv1Hr6no implements FlatMapFunction<Tuple3<String, String, String >, Tuple7<String, Long, Long, Long, Long, Long, Long>> {
         @Override
         public void flatMap(Tuple3<String, String, String > line, Collector<Tuple7<String, Long, Long, Long, Long, Long, Long>> out) {
             String[] counts = line.f2.split("\t");

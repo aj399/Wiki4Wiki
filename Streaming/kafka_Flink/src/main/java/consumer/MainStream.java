@@ -2,6 +2,8 @@ package consumer;
 
 import java.util.*;
 import consumer.LineSplitters.*;
+import consumer.TimeStampers.*;
+import consumer.RedisSink.*;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
@@ -62,7 +64,7 @@ public class MainStream  {
         DataStream<Tuple3<String, Long, Long>> dataIn = env
             .addSource(kafkaSource)
             .flatMap(new LnSplitArtTimePv())
-			.assignTimestampsAndWatermarks(new CustomTimestamper());
+			.assignTimestampsAndWatermarks(new TimestamperArtTimePv());
 
         DataStream<String> wikiCount10Min = dataIn
             .keyBy(0)
@@ -88,14 +90,14 @@ public class MainStream  {
         DataStream<Tuple3<String, String, String>> dataIn10Min = env
             .addSource(kafkaSource10Min)
             .flatMap(new LnSplitArtTimePv1Min())
-			.assignTimestampsAndWatermarks(new CustomTimestamper1());
+			.assignTimestampsAndWatermarks(new TimestamperArtTimePv10Min());
 		
 		
 		DataStream<Tuple3<String, String, String>> wikiCounts1Hr = dataIn10Min.keyBy(0)
             .timeWindow(Time.hours(1),Time.minutes(1))
 			.reduce(new tuple3Reduce());
 		
-		DataStream<Tuple7<String, Long, Long, Long, Long, Long, Long>> wikiCounts1HrList = wikiCounts1Hr.flatMap(new LnSplitArtPv1hr6no());
+		DataStream<Tuple7<String, Long, Long, Long, Long, Long, Long>> wikiCounts1HrList = wikiCounts1Hr.flatMap(new LnSplitArtPv1Hr6no());
 
 		DataStream<Tuple3<String, Long, Long>> trending1HrWiki = wikiCounts1HrList.filter(new FilterFunction<Tuple3<String, Long, Long>>() {
 			public boolean filter(Tuple3<String, Long, Long> value) { 
@@ -112,23 +114,6 @@ public class MainStream  {
         env.execute("SessionizationFn");
     }
 
-	public static class TrendingRedisMapper implements RedisMapper<Tuple3<String, Long, Long>>{
-
-        @Override
-        public RedisCommandDescription getCommandDescription() {
-            return new RedisCommandDescription(RedisCommand.LPUSH, "TRENDING");
-        }
-
-        @Override
-        public String getKeyFromData(Tuple3<String, Long, Long> data) {
-            return (String) "trending";
-        }
-
-        @Override
-        public String getValueFromData(Tuple3<String, Long, Long> data) {
-            return data.f0+"\t"+data.f1+"\t"+data.f2;
-        }
-    }
 	
 	public static class tuple3Reduce implements ReduceFunction<Tuple3<String, String, String>> {
 		@Override
@@ -145,52 +130,6 @@ public class MainStream  {
 		}
 	}
 	
-	public static class CustomTimestamper implements AssignerWithPeriodicWatermarks<Tuple3<String, Long, Long>> {
-
-
-		@Override
-		public long extractTimestamp(Tuple3<String, Long, Long> element, long previousElementTimestamp) {
-			return element.f1;
-		}
-
-		@Override
-		public Watermark getCurrentWatermark() {
-			return null;
-		}
-
-	}
-
-	public static class CustomTimestamper1 implements AssignerWithPeriodicWatermarks<Tuple3<String, String, String>> {
-
-
-		@Override
-		public long extractTimestamp(Tuple3<String, String, String> element, long previousElementTimestamp) {
-			return Long.parseLong(element.f1);
-		}
-
-		@Override
-		public Watermark getCurrentWatermark() {
-			return null;
-		}
-
-	}
-	
-	
-	private static class NameKeySelector implements KeySelector<Tuple3<String, String, String>, String> {
-		@Override
-		public String getKey(Tuple3<String, String, String> value) {
-			return value.f0;
-		}
-	}
-	
-	private static class NameKeySelector2 implements KeySelector<Tuple2<String, String>, String> {
-		@Override
-		public String getKey(Tuple2<String, String> value) {
-			return value.f0;
-		}
-	}
-
-
 
 }
 
