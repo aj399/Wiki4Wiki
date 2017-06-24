@@ -5,6 +5,7 @@ consumer/MainStream.class
 consumer/MainStream$JoinStream.class
 consumer/MainStream$NameKeySelector2.class
 consumer/MainStream$1.class
+consumer/MainStream$TrendingRedisMapper.class
 consumer/MainStream$CustomTimestamper1.class
 consumer/MainStream$LineSplitter2.class
 consumer/MainStream$LineSplitter1.class

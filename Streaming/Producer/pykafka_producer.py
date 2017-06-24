@@ -14,7 +14,7 @@ import json
 def producerInit():
     wikiArt = {}
     nArt = 0
-    with open('../myConfig.json', 'r') as cFile:
+    with open('../streamingConfig.json', 'r') as cFile:
         myconfigs = json.load(cFile)
 
     wFile = open('../wikiList', 'r')
