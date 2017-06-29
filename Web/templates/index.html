@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+</head>
+<body>
+
+
+<div class="container">
+  <h2>WikiTrends</h2>
+  <p>Lists wikipedia articles trending in the last hour and updated every minute:</p>            
+  <table class="table">
+    <thead>
+      <tr>
+        <th>WikiPedia Article</th>
+        <th>Trend Pattern</th>
+      </tr>
+    </thead>
+    <tbody>
+
+    {% for i in container %}
+		
+      <tr>
+        <td width="25%">
+		<p><a id="article-link{{i}}">link</a></p></td>
+        <td><div id={{ "container%s"%i }} ></div></td>
+      </tr>
+      
+
+    {% endfor %}
+
+
+    
+
+    </tbody>
+  </table>
+</div>
+
+{% for i in range(Num) %}
+<script type="text/javascript">
+
+$(document).ready(function(){
+
+var calls = function(){
+$.getJSON('/data',function(data){
+
+console.log(data);
+$("#article-linkc{{i}}")
+.text("https://en.wikipedia.org/wiki/" + data.articlelist[{{i}}].substring(data.articlelist[{{i}}].length-15))
+.attr("href", "https://en.wikipedia.org/wiki/" + data.articlelist[{{i}}]);
+var {{ container[i] }} = new Highcharts.chart({{ "container%s"%container[i] }}, {
+
+    title: {
+        text: 'Article Trend'
+    },
+
+	xAxis: {
+		categories: data.timelist[{{i}}],
+		title: {
+			text: 'Time'
+		}
+    },
+	
+    yAxis: {
+        title: {
+            text: 'Number of Requests'
+        }
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+
+    series: [{
+        data: data.datalist[{{i}}]
+    }]
+
+});
+
+
+});
+
+};
+
+calls()
+setInterval(calls,12000);
+
+
+
+});
+ 
+
+
+
+
+</script>
+
+ {% endfor %}
+
+</body>
+</html>
