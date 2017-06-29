@@ -5,8 +5,7 @@ import redis
 import os
 from operator import add
 
-#currHr = datetime.datetime.now().hour
-currHr = 5
+currHr = datetime.datetime.now().hour
 sCurrHr = str(currHr)
 if currHr<10:
 	sCurrHr = "0"+sCurrHr
