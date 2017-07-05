@@ -35,38 +35,61 @@ Install all the above mentioned dependencies
 ## Stream Job
 
 Create the streamingConfig.json inside the Streaming folder
+
 Assign the following values:
+
 "WORKERS_IP": 'flink worker ips':9092,
+
 "MASTER_IP" : 'flink master ip':2181,
+
 "CONSUMER_TOPIC" : 'topic name to which python producer publishes the article request',
+
 "PRODUCER_TOPIC" : 'base topic name of the diffenet queues(queue0 - queue9) flink produces,
+
 "REDIS_IP" : 'Redis ip address'
 
 Run the producer( You can run 2 or 3 producers depending on throughput you require, you could also provide a real life stream if you have it)
+
 python /Streaming/Producer pykafka_producer.py
 
 Clean The maven repository
+
 mvn clean package(called inside kafkaFlink folder inside Streaming folder)
+
 Build the repository
+
 mvn install(called inside kafkaFlink folder inside Streaming folder)
+
 Run the flink job
+
 /usr/local/flink/bin/flink run -c consumer.MainStream target/consumer-0.0.jar
 
 ## Batch Job
 
 Create the batchConfig.json inside the Batch folder
+
 Assign the following values:
+
 "APP_NAME": 'Name of the spark job',
+
 "S3_ACCESS_KEY": 'Acces key of your s3 bucket',
+
 "S3_SECRET_KEY": 'Secret key of your s3 bucket',
+
 "BUCKET_NAME": 'Name of your s3 bucket',
+
 "OP_FOLDER_NAME": 'Permanent Folder were hourly averages of articles are stored',
+
 "IP_FOLDER_NAME": 'Permanent folder where historical data of hourly log data is stored',
+
 "WORK_FOLDER_NAME": 'Temporary folder where daily hourly log data is stored',
+
 "TEMP_FOLDER_NAME": 'Temporary folder where you store your temporary results',
+
 "REDIS_IP": "Redis ip address"
 
 Calculate the historical averages(Call it only once on your entire historical data)
+
 $SPARK_HOME/bin/spark-submit --master spark://'ip address of your spark master':7077 batchAvgArtView.py
 
 Run the anomaly detection job every hour when new hourly data has arrived on s3 from flink, you could use cron or preferrably luigi(using cron now which is triggered every hour, which is not working as flink is not writing to s3 in the expected time limit, hoping to to trigger it using luigi in future)
@@ -74,11 +97,15 @@ Run the anomaly detection job every hour when new hourly data has arrived on s3 
 ## Web
 
 Create the webConfig.json inside the Web folder
+
 Assign the followin values
+
 "REDIS_IP": ' Redis ip address',
+
 "TRENDING": 'key of the trending topics'
 
 Run the web end
+
 sudo -E python tornadoapp.py
 
 # Slides
