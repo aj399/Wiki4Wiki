@@ -1,20 +1,20 @@
-# Wiki4Wiki
+# wiki4wiki
 
-## Table of Contents
-1. [Summary](README.md## summary)
-2. [PipeLine](README.md## pipeline)
-3. [Dependencies](README.md## dependency)
-4. [Installation](README.md## installation)
-5. [Slides](README.md## slides)
-6. [WebSite](README.md## website)
+# Table of Contents
+1. [Summary](README.md#summary)
+2. [PipeLine](README.md#pipeline)
+3. [Dependencies](README.md#dependency)
+4. [Installation](README.md#installation)
+5. [Slides](README.md#slides)
+6. [WebSite](README.md#website)
 
-## Summary
+# Summary
   My application discovers anomalies in page requests of Wikipedia articles , by juxtaposing 7 months of historical data with the current streaming data. Every minute it detects the articles that are trending in the last 1 hour among 6 million possible articles.  Historical spark batch job that averages hourly page requests of 10 million different articles over 7 months which is about 1 TB. In streaming side flink aggregates the page requests of 6 million different articles over a 1 hr period and that data is send to s3. And every hour a spark job identifies the articles with anomalous page requests pattern by juxtaposing the aggregated streaming data and the historical average
 
-## Pipeline
+# Pipeline
 ![alt text](https://github.com/aj399/Wiki4Wiki/blob/master/pipeline.PNG "PipeLine")
 
-## Dependency
+# Dependency
 
 This program requires:
 
@@ -27,12 +27,12 @@ This program requires:
 7. PyKafka
 8. Tornado Server 
 
-## Installation
+# Installation
 Clone the repository using git clone https://github.com/aj399/Wiki4Wiki.git
 
 Install all the above mentioned dependencies 
 
-### Stream Job
+## Stream Job
 
 Create the streamingConfig.json inside the Streaming folder
 Assign the following values:
@@ -52,7 +52,7 @@ mvn install(called inside kafkaFlink folder inside Streaming folder)
 Run the flink job
 /usr/local/flink/bin/flink run -c consumer.MainStream target/consumer-0.0.jar
 
-### Batch Job
+## Batch Job
 
 Create the batchConfig.json inside the Batch folder
 Assign the following values:
@@ -71,7 +71,7 @@ $SPARK_HOME/bin/spark-submit --master spark://'ip address of your spark master':
 
 Run the anomaly detection job every hour when new hourly data has arrived on s3 from flink, you could use cron or preferrably luigi(using cron now which is triggered every hour, which is not working as flink is not writing to s3 in the expected time limit, hoping to to trigger it using luigi in future)
 
-### Web
+## Web
 
 Create the webConfig.json inside the Web folder
 Assign the followin values
@@ -81,8 +81,8 @@ Assign the followin values
 Run the web end
 sudo -E python tornadoapp.py
 
-## Slides
+# Slides
 https://docs.google.com/presentation/d/1r9yIkb7sroe-EO4-UrqISO3w14GQFEmGTvkLwsW2OXs/edit#slide=id.p
 
-## WebSite
+# WebSite
 http://wiki4wiki.site
