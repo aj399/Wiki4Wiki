@@ -17,3 +17,9 @@ This program requires:
 5. Apache Kafka version 0.9.0.1
 6. Redis version 3.2.6
 7. PyKafka
+
+## Slides
+https://docs.google.com/presentation/d/1r9yIkb7sroe-EO4-UrqISO3w14GQFEmGTvkLwsW2OXs/edit#slide=id.p
+
+## Site
+http://wiki4wiki.site
