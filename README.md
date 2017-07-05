@@ -18,8 +18,8 @@ This program requires:
 6. Redis version 3.2.6
 7. PyKafka
 
-##Slides
+## Slides
 https://docs.google.com/presentation/d/1r9yIkb7sroe-EO4-UrqISO3w14GQFEmGTvkLwsW2OXs/edit#slide=id.p
 
-##Site
+## Site
 http://wiki4wiki.site
