@@ -36,9 +36,8 @@ Install all the above mentioned dependencies
 
 1. Create the streamingConfig.json inside the Streaming folder
 
-2. Assign the following values:
-
-    '''
+2. Assign the following values to 'streamConfig.json':
+  {
     
     "WORKERS_IP": 'flink worker ips':9092,
 
@@ -49,30 +48,30 @@ Install all the above mentioned dependencies
     "PRODUCER_TOPIC" : 'base topic name of the diffenet queues(queue0 - queue9) flink produces,
 
     "REDIS_IP" : 'Redis ip address'
-    '''
+ }
 
-3. Run the producer( You can run 2 or 3 producers depending on throughput you require, you could also provide a real life stream if you have it)
+3. Run the producer( You can run 2 or 3 producers depending on throughput you require, you could also provide a real life stream if you have it) in the 'Stream' folder:
 
-  python /Streaming/Producer pykafka_producer.py
+    python /Streaming/Producer pykafka_producer.py 
 
-4. Clean The maven repository
+4. Clean The maven repository which is inside 'kafkaFlink' folder:
 
-  mvn clean package(called inside kafkaFlink folder inside Streaming folder)
+    mvn clean package
 
-5. Build the repository
+5. Build the repository which is inside 'kafkaFlink' folder:
 
-  mvn install(called inside kafkaFlink folder inside Streaming folder)
+    mvn install
 
-6. Run the flink job
+6. Run the flink job 'MainStream'
 
-  /usr/local/flink/bin/flink run -c consumer.MainStream target/consumer-0.0.jar
+    /usr/local/flink/bin/flink run -c consumer.MainStream target/consumer-0.0.jar
 
 ## Batch Job
 
 1. Create the batchConfig.json inside the Batch folder
 
-2. Assign the following values:
-    '''
+2. Assign the following values to 'batchConfig.json':
+  {
 
     "APP_NAME": 'Name of the spark job',
 
@@ -91,11 +90,11 @@ Install all the above mentioned dependencies
     "TEMP_FOLDER_NAME": 'Temporary folder where you store your temporary results',
 
     "REDIS_IP": "Redis ip address"
-    '''
+  }
 
-3. Calculate the historical averages(Call it only once on your entire historical data)
+3. Calculate the historical averages(Call it only once on your entire historical data) by calling 'btachAvgArtView.py':
 
-  $SPARK_HOME/bin/spark-submit --master spark://'ip address of your spark master':7077 batchAvgArtView.py
+    $SPARK_HOME/bin/spark-submit --master spark://'ip address of your spark master':7077 batchAvgArtView.py
 
 4. Run the anomaly detection job every hour when new hourly data has arrived on s3 from flink, you could use cron or preferrably luigi(using cron now which is triggered every hour, which is not working as flink is not writing to s3 in the expected time limit, hoping to to trigger it using luigi in future)
 
@@ -103,17 +102,17 @@ Install all the above mentioned dependencies
 
 1. Create the webConfig.json inside the Web folder
 
-2. Assign the followin values
-    '''
+2. Assign the followin values to 'webConfig.json':
+  {
 
     "REDIS_IP": ' Redis ip address',
 
     "TRENDING": 'key of the trending topics
-    '''
+  }
 
-3. Run the web app using tornado
+3. Run the web app inside the 'web' folder using tornado
 
-  sudo -E python tornadoapp.py
+    sudo -E python Web/tornadoapp.py
 
 # Slides
 https://docs.google.com/presentation/d/1r9yIkb7sroe-EO4-UrqISO3w14GQFEmGTvkLwsW2OXs/edit#slide=id.p
