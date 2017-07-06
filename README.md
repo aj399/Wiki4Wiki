@@ -38,15 +38,18 @@ Install all the above mentioned dependencies
 
 2. Assign the following values:
 
-  "WORKERS_IP": 'flink worker ips':9092,
+    '''
+    
+    "WORKERS_IP": 'flink worker ips':9092,
 
-  "MASTER_IP" : 'flink master ip':2181,
+    "MASTER_IP" : 'flink master ip':2181,
 
-  "CONSUMER_TOPIC" : 'topic name to which python producer publishes the article request',
+    "CONSUMER_TOPIC" : 'topic name to which python producer publishes the article request',
 
-  "PRODUCER_TOPIC" : 'base topic name of the diffenet queues(queue0 - queue9) flink produces,
+    "PRODUCER_TOPIC" : 'base topic name of the diffenet queues(queue0 - queue9) flink produces,
 
-  "REDIS_IP" : 'Redis ip address'
+    "REDIS_IP" : 'Redis ip address'
+    '''
 
 3. Run the producer( You can run 2 or 3 producers depending on throughput you require, you could also provide a real life stream if you have it)
 
@@ -69,24 +72,26 @@ Install all the above mentioned dependencies
 1. Create the batchConfig.json inside the Batch folder
 
 2. Assign the following values:
+    '''
 
-  "APP_NAME": 'Name of the spark job',
+    "APP_NAME": 'Name of the spark job',
 
-  "S3_ACCESS_KEY": 'Acces key of your s3 bucket',
+    "S3_ACCESS_KEY": 'Acces key of your s3 bucket',
 
-  "S3_SECRET_KEY": 'Secret key of your s3 bucket',
+    "S3_SECRET_KEY": 'Secret key of your s3 bucket',
 
-  "BUCKET_NAME": 'Name of your s3 bucket',
+    "BUCKET_NAME": 'Name of your s3 bucket',
 
-  "OP_FOLDER_NAME": 'Permanent Folder were hourly averages of articles are stored',
+    "OP_FOLDER_NAME": 'Permanent Folder were hourly averages of articles are stored',
 
-  "IP_FOLDER_NAME": 'Permanent folder where historical data of hourly log data is stored',
+    "IP_FOLDER_NAME": 'Permanent folder where historical data of hourly log data is stored',
 
-  "WORK_FOLDER_NAME": 'Temporary folder where daily hourly log data is stored',
+    "WORK_FOLDER_NAME": 'Temporary folder where daily hourly log data is stored',
 
-  "TEMP_FOLDER_NAME": 'Temporary folder where you store your temporary results',
+    "TEMP_FOLDER_NAME": 'Temporary folder where you store your temporary results',
 
-  "REDIS_IP": "Redis ip address"
+    "REDIS_IP": "Redis ip address"
+    '''
 
 3. Calculate the historical averages(Call it only once on your entire historical data)
 
@@ -99,10 +104,12 @@ Install all the above mentioned dependencies
 1. Create the webConfig.json inside the Web folder
 
 2. Assign the followin values
+    '''
 
-  "REDIS_IP": ' Redis ip address',
+    "REDIS_IP": ' Redis ip address',
 
-  "TRENDING": 'key of the trending topics'
+    "TRENDING": 'key of the trending topics
+    '''
 
 3. Run the web app using tornado
 
