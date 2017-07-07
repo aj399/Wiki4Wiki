@@ -115,7 +115,7 @@ Install all the above mentioned dependencies
     sudo -E python Web/tornadoapp.py
 
 # Slides
-https://docs.google.com/presentation/d/1r9yIkb7sroe-EO4-UrqISO3w14GQFEmGTvkLwsW2OXs/edit#slide=id.p
+http://bit.ly/2uRSQS8
 
 # WebSite
 http://wiki4wiki.site
