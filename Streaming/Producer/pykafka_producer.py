@@ -37,7 +37,7 @@ def producerInit():
 def produceFunc(producer, wikiArt, nArt):
     while True:
 		dTime = time.time()
-		currArticle = wikiArt[randint(0,50)]
+		currArticle = wikiArt[randint(0,nArt-1)]
 		outputStr = "{}\t{}".format(currArticle, np.int64(np.floor(dTime))) 
 		print outputStr
                 producer.produce(outputStr, partition_key=str(currArticle))
