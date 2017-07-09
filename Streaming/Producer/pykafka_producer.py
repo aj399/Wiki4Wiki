@@ -1,3 +1,5 @@
+#Generating random pagerequests from 6 million possible wikipedia articles present in 'wikiList' file 
+
 import sys
 from pykafka import KafkaClient
 from pykafka.partitioners import HashingPartitioner
@@ -19,13 +21,11 @@ def producerInit():
 
     wFile = open('../wikiList', 'r')
     for line in wFile:
+	#Extracting wikipedia article name which is present in the 2 word in each line
         wikiArt[nArt] = line.split(" ")[1].lower()
         nArt += 1
        
     nArt -= 1
-    print str(myconfigs["WORKERS_IP"])
-    print str(myconfigs["CONSUMER_TOPIC"]) 
-    print str(myconfigs["MASTER_IP"])
     client   = KafkaClient(hosts=str(myconfigs["WORKERS_IP"]),zookeeper_hosts=str(myconfigs["MASTER_IP"]))
     topic    = client.topics[str(myconfigs["CONSUMER_TOPIC"])]
     hash_partitioner = HashingPartitioner()
@@ -39,7 +39,8 @@ def produceFunc(producer, wikiArt, nArt):
 		dTime = time.time()
 		currArticle = wikiArt[randint(0,nArt-1)]
 		outputStr = "{}\t{}".format(currArticle, np.int64(np.floor(dTime))) 
-		print outputStr
+		#sending page requests keyed by the wikipedia article so that same article always goes to the same flink consumer, 
+		#so there is no need for shuffling to aggregate 10 minute of the pagerequest data
                 producer.produce(outputStr, partition_key=str(currArticle))
     
 if __name__ == '__main__':
