@@ -1,3 +1,4 @@
+//Assigning event time stamp
 package consumer;
 
 import java.util.*;
