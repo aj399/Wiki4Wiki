@@ -72,6 +72,7 @@ else:
 	for i in cumTop10Rdd:
 		conn.sadd(sCurrHr,str(i[0])+":"+str(i[1]))
 
+	#Removing the previous hour RHS and LHS values
 	removeCmd="hdfs dfs -rm -r -skipTrash s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+WKFOLDER+"/prev"
 	os.system(removeCmd)
 	cumDiffRddS.saveAsSequenceFile("s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+WKFOLDER+"/prev")
