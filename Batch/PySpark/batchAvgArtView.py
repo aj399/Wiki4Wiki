@@ -25,7 +25,6 @@ for i in range(24):
 	avgHrlyPageViewRdd = aggrHrlyPageViewRdd.mapValues(lambda x: x[0]/x[1])
 	
 	#used sequence files as it would be faster to read as key value pairs in the next spark job
-	sumPageViewRdd.saveAsSequenceFile("s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+OPFOLDER+"/sum/"+subFolder+"/") # Storing sum and count so as to do moving averages, when new daily data comes in
-	countPageViewRdd.saveAsSequenceFile("s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+OPFOLDER+"/count/"+subFolder+"/")
-	avgPageViewRdd.saveAsSequenceFile("s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+OPFOLDER+"/avg/"+subFolder+"/")
+	countPageViewRdd.saveAsSequenceFile("s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+OPFOLDER+"/count/"+subFolder+"/") # Storing sum and count so as to do moving averages, when new daily data comes in
+	avgHrlyPageViewRdd.saveAsSequenceFile("s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+OPFOLDER+"/avg/"+subFolder+"/")
 	
