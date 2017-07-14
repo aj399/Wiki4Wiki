@@ -117,5 +117,3 @@ Install all the above mentioned dependencies
 # Slides
 http://bit.ly/2uRSQS8
 
-# WebSite
-http://wiki4wiki.site
