@@ -6,12 +6,24 @@
 3. [Dependencies](README.md#dependency)
 4. [Installation](README.md#installation)
 5. [Slides](README.md#slides)
-6. [WebSite](README.md#website)
 
 # Summary
-  My application discovers anomalies in page requests of Wikipedia articles , by juxtaposing 7 months of historical data with the current streaming data. Every minute it detects the articles that are trending in the last 1 hour among 6 million possible articles.  Historical spark batch job that averages hourly page requests of 10 million different articles over 7 months which is about 1 TB. In streaming side flink aggregates the page requests of 6 million different articles over a 1 hr period and that data is send to s3. And every hour a spark job identifies the articles with anomalous page requests pattern by juxtaposing the aggregated streaming data and the historical average
+  My application discovers anomalies in page requests of Wikipedia articles , by juxtaposing 7 months of historical data with the current streaming data. Every minute it detects the articles that are trending in the last 1 hour among 6 million possible articles using flink. And every hour a spark job identifies the articles with anomalous page requests pattern by juxtaposing the aggregated streaming data and the historical average my measuring the difference in behaviour using canberra distance(https://en.wikipedia.org/wiki/Canberra_distance).
 
 # Pipeline
+Python producers generate random request for 6 million possible articles and that data is send to flink.
+
+Flink creates a sliding window of ten minute width updated every one minute and page request for each article in aggreagated in those windows. The window is named based on the starting minute of the window(10:00 - window 0, 11:59  - window 59 ..). These data is written to one of 10 possible kafka topics(0-9) based on the unit's digits of window(window 0- topic 0, window 59 - topic 9 ..). These data is read again by flink sliding window of width one hour updated every one minute. That is each window would have page requests count for each of these articles for 6 consectuive 10 minute windows which constitutes the past 1 hour(eg: topic 1 could have data from 6 windows -  window 1(10:01-10:11), window 11(10:11-10:21), window 21(10:21-10:31), window 31(10:11-10:21), window 41(10:41-10:51), window 51(10:51-11:01)). Flink calculates the trending articles by filtering out articles whose page requests has gone down in one of the those 6 consecutive windows. The result is sent to redis and from there data is queried by flask to display the trending articles.  
+
+Flink also at end of each hour sends aggregated page request for each article for one hour and send that data to S3. S3 also contains average hourly page request of each article calculated by aggregating 7 months of data(1 TB) using a spark job. Cron at every fifth minute of the hour triggers a spark job called canbera.py. The spark job gathers the current houlry page request for the article and average houlry page request for the article till the current hour and represent both of them as vectors. 
+
+historical vector = (historical average at hour 1, historical average at hour 2, .., historical average at hour 11)  
+current vector = (current requests at hour 1, current requests at hour 2, .., current requests at hour 11)  
+
+calculates the distance between them using canberra distance(https://en.wikipedia.org/wiki/Canberra_distance) and identifies the articles with top 5 distance and send that data to redis.
+
+Also at the end of day spark job is triggered by cron which recalculates the historical average with the new days data using cumulative moving average.
+
 ![alt text](https://github.com/aj399/Wiki4Wiki/blob/master/pipeline.PNG "PipeLine")
 
 # Dependency
