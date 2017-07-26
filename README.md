@@ -1,4 +1,4 @@
-# wiki4wiki
+# Wiki4Wiki
 
 # Table of Contents
 1. [Summary](README.md#summary)
