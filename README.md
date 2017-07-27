@@ -23,11 +23,11 @@ Articles are then identified as "trending" when the number of pagviews has not d
 
 Additionally, at end of each hour the aggregated pageviews for each article over the past one hour is saved to S3. S3 also contains average hourly page request of each article calculated by aggregating 7 months of data (1 TB) using a Spark job. A cron job is then triggered at every fifth minute of the hour to run a Spark job that calculates the canbera distance between the historical and streaming data, representing both as vectors. 
 
-'''
+```
 At hour 11:
 historical vector = (historical average at hour 1, historical average at hour 2, .., historical average at hour 11)  
 current vector = (current requests at hour 1, current requests at hour 2, .., current requests at hour 11)  
-'''
+```
 
 The canberra distance (https://en.wikipedia.org/wiki/Canberra_distance) calculates the difference between the historical and current vector, identifying the top five articles with the highest distance and saves them to Redis.
 
