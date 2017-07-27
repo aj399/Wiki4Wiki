@@ -8,21 +8,30 @@
 5. [Slides](README.md#slides)
 
 # Summary
-  My application discovers anomalies in page requests of Wikipedia articles , by juxtaposing 7 months of historical data with the current streaming data. Every minute it detects the articles that are trending in the last 1 hour among 6 million possible articles using flink. And every hour a spark job identifies the articles with anomalous page requests pattern by juxtaposing the aggregated streaming data and the historical average my measuring the difference in behaviour using canberra distance(https://en.wikipedia.org/wiki/Canberra_distance).
+My application discovers anomalies in page requests of Wikipedia articles, by juxtaposing 7 months of historical data with the current streaming data and identifying which articles' pageviews are most divergent. Every minute it detects the articles that are trending in the last 1 hour among 6 million possible articles using Flink. At every hour, a Spark job identifies the articles with anomalous page requests pattern by juxtaposing the aggregated streaming data and historical average, and then measuring the difference in behaviour using a concept called canberra distance (https://en.wikipedia.org/wiki/Canberra_distance).
 
 # Pipeline
-Python producers generate random request for 6 million possible articles and that data is send to flink.
+Python producers generate random request for 6 million possible articles and sends the data to Kafka, which Flink then pulls from.
 
-Flink creates a sliding window of ten minute width updated every one minute and page request for each article in aggreagated in those windows. The window is named based on the starting minute of the window(10:00 - window 0, 11:59  - window 59 ..). These data is written to one of 10 possible kafka topics(0-9) based on the unit's digits of window(window 0- topic 0, window 59 - topic 9 ..). These data is read again by flink sliding window of width one hour updated every one minute. That is each window would have page requests count for each of these articles for 6 consectuive 10 minute windows which constitutes the past 1 hour(eg: topic 1 could have data from 6 windows -  window 1(10:01-10:11), window 11(10:11-10:21), window 21(10:21-10:31), window 31(10:11-10:21), window 41(10:41-10:51), window 51(10:51-11:01)). Flink calculates the trending articles by filtering out articles whose page requests has gone down in one of the those 6 consecutive windows. The result is sent to redis and from there data is queried by flask to display the trending articles.  
+Every minute, Flink aggregates 10 minutes worth of pageveiws for each article into one sliding window. This data is then published to one of 10 possible Kafka topics (0-9) depending on the last digit of the starting minute in any particular window. For instance, if there were 100 pageviews made for one particular article during the sliding window from 10:00a.m. to 10:10a.m., that data would be written to Kafka Topic 0. The number of pageviews for that same article during the sliding window from 10:59a.m. to 11:09 would correspondingly be written to Kafka Topic 9.
 
-Flink also at end of each hour sends aggregated page request for each article for one hour and send that data to S3. S3 also contains average hourly page request of each article calculated by aggregating 7 months of data(1 TB) using a spark job. Cron at every fifth minute of the hour triggers a spark job called canbera.py. The spark job gathers the current houlry page request for the article and average houlry page request for the article till the current hour and represent both of them as vectors. 
+Using this scheme, we can determine how many pageviews have been made during any particular hour by grabbing six consecutive sliding windows.
 
+At every minute that the Flink consumer is triggered, it checks the corresponding topic and pulls the last six sliding windows. For instance, at 10:00a.m., pulling the last six sliding windows from Kafka Topic 0 would result in six aggregated pageview values between 9:00a.m. and 10:00a.m.
+
+Articles are then identified as "trending" when the number of pagviews has not decreased in any of those six consecutive windows. That data is saved to Redis and available to the Flask front-end.  
+
+Additionally, at end of each hour the aggregated pageviews for each article over the past one hour is saved to S3. S3 also contains average hourly page request of each article calculated by aggregating 7 months of data (1 TB) using a Spark job. A cron job is then triggered at every fifth minute of the hour to run a Spark job that calculates the canbera distance between the historical and streaming data, representing both as vectors. 
+
+'''
+At hour 11:
 historical vector = (historical average at hour 1, historical average at hour 2, .., historical average at hour 11)  
 current vector = (current requests at hour 1, current requests at hour 2, .., current requests at hour 11)  
+'''
 
-calculates the distance between them using canberra distance(https://en.wikipedia.org/wiki/Canberra_distance) and identifies the articles with top 5 distance and send that data to redis.
+The canberra distance (https://en.wikipedia.org/wiki/Canberra_distance) calculates the difference between the historical and current vector, identifying the top five articles with the highest distance and saves them to Redis.
 
-Also at the end of day spark job is triggered by cron which recalculates the historical average with the new days data using cumulative moving average.
+Also at the end of day, another Spark job is triggered by cron to calculate a cummulative moving average from the most recent pageveiw data. That data is then used to update the historical average.
 
 ![alt text](https://github.com/aj399/Wiki4Wiki/blob/master/pipeline.PNG "PipeLine")
 
@@ -62,7 +71,7 @@ Install all the above mentioned dependencies
     "REDIS_IP" : 'Redis ip address'
  }
 
-3. Run the producer( You can run 2 or 3 producers depending on throughput you require, you could also provide a real life stream if you have it) in the 'Stream' folder:
+3. Run the producer (You can run 2 or 3 producers depending on throughput you require, you could also provide a real life stream if you have it) in the 'Stream' folder:
 
     python /Streaming/Producer pykafka_producer.py 
 
@@ -108,7 +117,7 @@ Install all the above mentioned dependencies
 
     $SPARK_HOME/bin/spark-submit --master spark://'ip address of your spark master':7077 batchAvgArtView.py
 
-4. Run the anomaly detection job every hour when new hourly data has arrived on s3 from flink, you could use cron or preferrably luigi(using cron now which is triggered every hour, which is not working as flink is not writing to s3 in the expected time limit, hoping to to trigger it using luigi in future)
+4. Run the anomaly detection job every hour when new hourly data has arrived on S3 from Flink, you could use cron or preferably Luigi (Luigi, or Apache Airflow is preferable because it can be triggered whenever data appears on S3)
 
 ## Web
 
