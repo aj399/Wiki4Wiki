@@ -55,10 +55,10 @@ else:
 			#Storing LHS and RHS for usage in the next hour computation
 			currDiffRddS.saveAsSequenceFile("s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+WKFOLDER+"/prev")
 			currAvgRdd = currDiffRdd.map(lambda x:(x[0],float(x[1][0])/float(x[1][1])))
-			#Top 10 articles with pagerequests varying most from its historical data
-			currTop10Rdd = currAvgRdd.top(10, key=lambda x:x[1])
+			#Top 5 articles with pagerequests varying most from its historical data
+			currTop10Rdd = currAvgRdd.top(5, key=lambda x:x[1])
 			for i in currTop10Rdd:
-				conn.sadd(str(currHr),str(i[0])+":"+str(i[1])) # top 10 anomalous articles sent to redis keyed by the current hour
+				conn.sadd(str(currHr),str(i[0])+":"+str(i[1])) # top 5 anomalous articles sent to redis keyed by the current hour
 
 			#The current file sent by flink stored in the work folder moved to temp folder from which it would be transferred to the main folder at the end of the day
 			moveCmd="hdfs dfs -mv s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+WKFOLDER+"/"+sCurrHr+" s3a://"+ACCKEY+":"+SECKEY+"@"+BUCKET+"/"+TMFOLDER+"/"+sCurrHr+"/"+currFileName
